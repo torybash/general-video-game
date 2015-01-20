@@ -59,7 +59,7 @@ In order to generate complete games through evolution we need generic and reliab
 \section{Introduction}
 How well do knowledge-free algorithms play really bad video games? This might not be a question that has kept you awake at night, but as we shall show there are excellent reasons to consider it. Reasons having to do with understanding fundamental design characteristics of a broad class of simple video games, and laying the groundwork for automatically generating such games.
 
-One way to generate complete games is to search a space of games represented in some game description language (GDL). The search could be done with e.g. evolutionary computation, starting with a population of randomly generated games and/or hand-designed games, and applying generation after generation of mutation and recombination, keeping the better game and replacing the worse games. Eventually such a process is likely to come up with good games that no-one has ever seen before.
+One way to generate complete games is to search a space of games represented in a programming language like C or Java, however the subset of games with well-formed rules can be increased by using a game description language (GDL). The search could be done with e.g. evolutionary computation, starting with a population of randomly generated games and/or hand-designed games, and applying generation after generation of mutation and recombination, keeping the better game and replacing the worse games. Eventually such a process is likely to come up with good games that no-one has ever seen before.
 
 But this supposes that we have a way of automatically telling good games from bad games (or not-quite-so-bad games from really bad games). In other words, we need a fitness function. Part of the fitness function could consist in inspecting the rules as expressed in the GDL, e.g. to make sure that there are winning conditions which could in principle be fulfilled. But there are many bad games that fulfil such criteria. To really understand a game, you need to play it. It seems the fitness function therefore needs to incorporate a capacity to play the games it is evaluating.
 
@@ -92,9 +92,9 @@ Objects have physical properties (i.e. position, direction) which can be altered
 
 \subsection{The GVG-AI Framework}
 
-The GVG-AI framework is a testbed for testing general gameplaying controllers against games specified using VGDL. Controllers are called once at the beginning of each game for setup, and then once per clock tick to select an action. Controllers do not have access to the VGDL descriptions of the games. They receive only the game's current state, passed as a parameter when the controller is asked for a move. However these states can be forward-simulated to future states. Thus the game rules are not directly available, but a simulatable model of the game can be used.
+The GVG-AI framework is a testbed for testing general game-playing controllers against games specified using VGDL. Controllers are called once at the beginning of each game for setup, and then once per clock tick to select an action. Controllers do not have access to the VGDL descriptions of the games. They receive only the game's current state, passed as a parameter when the controller is asked for a move. However these states can be forward-simulated to future states. Thus the game rules are not directly available, but a simulatable model of the game can be used.
 
-The framework additionally contains 20 hand-designed games, which mostly consist of interpretations of classic video games. Figure \ref{fig:vgdl} shows the VGDL description of the game \emph{Missile Command}.
+The framework additionally contains 20 hand-designed games, which mostly consist of interpretations of classic video games. Each game is also accompanied by five different levels. Figure \ref{fig:vgdl} shows the VGDL description of the game \emph{Missile Command}.
 
 
 \begin{figure}[!ht]
@@ -136,7 +136,7 @@ BasicGame
 
 \section{Method}
 %Gabriella
-This section describes the processes used to generate VGDL descriptions. First, it will describe the set of human-defined games and controllers used during generation and testing. Then, the two different generation method will be discussed: One that generated descriptions randomly, within certain constraints, and one that tries to mutate existing games into new ones.
+This section describes the processes used to generate VGDL descriptions, and the expiremental setup in testing the resulting games. First, it will describe the set of human-defined games and controllers used during generation and testing. Then, the two different generation method will be discussed: One that generated descriptions randomly, within certain constraints, and one that tries to mutate existing games into new ones.
 
 \subsection{Example games}
 \label{method:examples}
@@ -146,7 +146,6 @@ The remaining 18 hand-designed VGDL game descriptions were chosen to be used as 
 Most of the games are inspired by classic arcade- and Atari games (e.g. Boulderdash, Frogger, Missile Command and Pacman), while some are original creations by the General Video-Game AI Competition's organizers. 
 
 The games can in general be described as action arcade games, in that the player controls a single avatar which must be moved quickly around in a 2D-setting to win, or to get a high score (the player is able to increment a score  counter in all of the games).
-A brief descriptions of each game can be seen below:\\
 
 \begin{figure}[!ht]
 	\subfloat{%\emph{Zelda}\label{subfig-2:dummy}]{%
@@ -163,52 +162,7 @@ A brief descriptions of each game can be seen below:\\
 	\label{fig:dummy}
 \end{figure}
 
-\textbf{Aliens} Adaptation of \emph{Space Invaders}. Aliens are spawned from the top of the screen; the player wins by shooting them all.
-\textbf{Boulderdash} Adaptation of \emph{Boulder Dash}. The avatar has to dig through a cave to collect diamonds while avoiding being smashed by falling rocks or killed by enemies.
-\textbf{Butterflies} The avatar has to capture all butterflies before all the cocoons are opened. Cocoons open when a butterfly touches them.
-\textbf{Chase} Chase and kill fleeing goats. However, if a fleeing goat encounters the corpse of another, it gets angry and starts chasing the player instead.
-\textbf{Digdug} Adaptation of \emph{Dig Dug}. The avatar collects gold coins and gems, digs through a cave, and avoids or shoots boulders at enemies.
-\textbf{Eggomania} Adaptation of \emph{Eggomania}. The avatar moves from left to right collecting eggs that fall from a chicken at the top of the screen, in order to use these eggs to shoot at the chicken, killing it.
-\textbf{Firecaster} The goal is to reach the exit by burning wood that is on the way. Ammunition is required to set things on fire.
-\textbf{Firestorms} The player must avoid flames from hell gates until reaching the exit of a maze.
-\textbf{Frogs} Adaptation of \emph{Frogger}. The player is a frog that has to cross a road and a river, without getting killed.
-\textbf{Infection} The objective is to infect all healthy animals. The player gets infected by touching a bug. Medics can cure infected animals.
-\textbf{Missile Command} Adaptation of \emph{Missile Command}. The player has to destroy falling missiles, before they reach their destinations. The player wins if any cities are saved.
-\textbf{Overload} The player must get to the exit after collecting coins. But too many coins make the player too heavy to pass through the exit.
-\textbf{Pacman} Adaptation of \emph{Pac-Man}. The goal is to clear a maze full of power pills and pellets, and avoid or destroy ghosts.
-\textbf{Portals} The objective is to get to a certain point using portals to go from one place to another, while at the same time avoiding lasers.
-\textbf{Seaquest} Adaptation of \emph{Seaquest}. The avatar is a submarine that rescue divers and avoids sea animals that can kill it. The goal is to maximize score.
-\textbf{Survive Zombies} The player has to flee zombies until time runs out, and can collect honey to kill the zombies.
-\textbf{Whackamole} Adaptation of \emph{Whac-a-Mole}. Must collect moles that appear from holes, and avoid a cat that mimics the moles.
-\textbf{Zelda} Adaptation of \emph{Legend of Zelda}. The objective is to find a key in a maze and leave the level. The player also has a sword to defend against enemies. \\
-%\textbf{Camelrace} Player needs to get to endpoint to win.
-%\textbf{Sokoban} The objective is to move the boxes to holes, until all boxes disappear or the time runs out.
-
-%\begin{description}
-%\item [Aliens] VGDL interpretation of the classic arcade game \emph{Space Invaders}. A large amount of aliens are spawned from the top of the screen. The player wins by shooting all the approaching aliens.
-%\item [Boulderdash] VGDL interpretation of \emph{Boulder Dash}. The avatar has to dig through a cave to collect diamonds while avoiding being smashed by falling rocks or killed by enemies. 
-%\item [Butterflies] The avatar has to capture all butterflies before all the cocoons are opened. Cocoons open when a butterfly touches them.
-%\item [Chase] About chasing and killing fleeing goats. However, if a fleeing goat encounters the corpse of another, it get angry and start chasing the player instead.
-%\item [Digdug] VGDL interpretation of \emph{Dig Dug}. Avatar collects gold coins and gems, digs his way through a cave and avoid or shoot boulders at enemies.
-%\item [Eggomania] VGDL interpretation of \emph{Eggomania}. Avatar moves from left to right collecting eggs that fall from a chicken at the top of the screen, in order to use these eggs to shoot at the chicken, killing it.
-%\item [Firecaster] Goal is to reach the exit by burning wood that is on the way. Ammunition is required to set things on fire.
-%\item [Firestorms] Player must avoid flames from hell gates until he finds the exit of a maze.
-%\item [Frogs] VGDL interpretation of \emph{Frogger}. Player is a frog that has to cross a road and a river, without getting killed.
-%\item [Infection] Objective is to infect all healthy animals. The player gets infected by touching a bug. Medics can cure infected animals.
-%\item [Missile Command] VGDL interpretation of the classic arcade game \emph{Missile Command}. Player has to destroy falling missiles, before they reach their destinations. If the player can save at least one city, he wins.
-%\item [Overload] Player must get to the level after collecting coins, but cannot collect too many coins, as he will be too heavy to traverse the exit.
-%\item [Pacman] A VGDL interpretation of \emph{Pac-Man}. Goal is to clear a maze full with power pills and pellets, and avoid or destroy ghosts.
-%\item [Portals] Objective is to get to a certain point using portals to go from one place to another, while at the same time avoiding lasers.
-%\item [Seaquest] VGDL interpretation of \emph{Seaquest}. Avatar is a submarine that rescue divers and avoids sea animals that can kill it. The goal is simply to a high score.
-%\item [Survive Zombies] Player has to flee zombies until time runs out, and can collect honey to kill the zombies.
-%\item [Whackamole] VGDL implementation of the classic arcade game \emph{Whac-a-Mole}. Must collect moles that appear from holes, and avoid a cat that mimics the moles.
-%\item [Zelda] VGDL interpretation of \emph{Legend of Zelda}. Objective is to find a key in a maze and leave the level. Player also has a sword to defend himself against enemies.
-%%\item [Camelrace] Player needs to get to endpoint to win.
-%%\item [Sokoban] The objective is to move the boxes to holes, until all boxes disappear or the time runs out.
-%\end{description}
-%list of the twenty games we have, what characterises them in general (put puzzle games?)
-
-Games each additionally include five designed levels. When testing (playing) each game we only used a single level to have more comparable scores.
+When testing (playing) each game we only used a single level to have more homogeneous scores.
 
 
 \subsection{Controllers}
@@ -216,7 +170,7 @@ Games each additionally include five designed levels. When testing (playing) eac
 %list of the controllers, short description of the two new (random-onestep and dontdie)
 %names: "one step look-ahead"->"OneStep-heuristic" - "random on step"->"OneStep-score"
 
-Seven general videogame controllers were used to test the games. The controllers use different approaches, with a varying degree of intelligence. Three of the controllers are included in the GVG-AI framework, while the remaining were implemented for this work. Except for \emph{OneStep-Heuristic}, the controllers only evaluate a given state according to its score and win/loss status.
+Seven general, knowledge-free (no access to game-rules) video game controllers were used to test the VGDL games. The controllers use different approaches, with a varying degree of intelligence. Three of the controllers are included in the GVG-AI framework, while the remaining were implemented for this work. Except for \emph{OneStep-Heuristic}, the controllers only evaluate a given state according to its score and win/loss status.
 
 \begin{description}
 	\item [MCTS] GVG-AI sample controller. ``Vanilla'' MCTS using UCT.
@@ -226,7 +180,6 @@ Seven general videogame controllers were used to test the games. The controllers
     \item [Random] Chooses a random action from those available in the current state.
 	\item [DoNothing] Returns a nil action. Literally does nothing.
 	\item [Explorer] Was made specifically for playing the simple arcade-style games of the GVG-AI framework well. Unlike the other controllers which utilises open loop searches, stores information about visited tiles and prefers visiting unvisited locations. Also addresses a common element of the VGDL example games, randomness. Combined with the fact that the player avatar can be killed in most of the games, the controller gains an advantage by simulating  the results of actions repeatedly, before deciding the best move.
-
 \end{description}
 
 
@@ -269,10 +222,10 @@ The number of sprites, interaction- and termination-rules were randomly chosen, 
 \section{Results}
 \label{sec:result}
 %Gabriella
-The seven controllers mentioned in section \ref{method:controllers} were used to play through a set of example-, mutated and randomly generated games. In the following sections, we show results of these tests, analyze the average of all play throughs for each controller, and compare the results with each other.
+The seven controllers mentioned in section \ref{method:controllers} were used to play through a set of example-, mutated and randomly generated games. Because of CPU budget limitations, each game was played for a maximum of 200 clock ticks, and each controller was restricted to use 50 ms on each tick. In the following sections, we show results of these tests, analyze the average of all play-throughs for each controller, and compare the results with each other.
 
 To more accurately compare the score for the different controllers across the range of different games, we normalise each score using a max-min normalisation. 
-Normalized averages and win rate averages are shown in Figures \ref{graph:maxminmean} and \ref{graph:winrate}, respectively. In Figure \ref{graph:maxminmean}, it is possible to see that the difference between the highest and lowest scores is greater in the example and mutated games than in the generated games. On the other hand, the average win rate of generated games surpasses both examples and mutated games, as shown in Figure \ref{graph:winrate}.
+Normalised averages and win rate averages are shown in Figures \ref{graph:maxminmean} and \ref{graph:winrate}, respectively. In Figure \ref{graph:maxminmean}, it is possible to see that the difference between the highest and lowest scores is greater in the example and mutated games than in the generated games. On the other hand, the average win rate of generated games surpasses both examples and mutated games, as shown in Figure \ref{graph:winrate}.
 
 In addition to the score and win-rate, the average entropy of actions chosen for the player avatar is shown in the tables below.
 %tables, possibly graphs, dry explanations of what we observer here (e.g. dontdie seems to do best in example games)
@@ -443,15 +396,38 @@ The \emph{normalised score means} and \emph{win-rates} have more similar values 
 
 The results in Section~\ref{sec:result} display some interesting patterns. Win rates suggest a relationship between intelligent controllers' success and better game design, corroborating our original hypothesis. In randomly generated games, which arguably tend to be less interesting than the others, smarter controllers (e.g. Explorer and MCTS) do only slightly better than the worse ones (i.e. Random and DoNothing). This is due to a general a lack of consistency between rules generated in this manner. Mutated games, however, derive from a designed game. Therefore, they maintain some characteristics of the original idea, which can improve the VGDL description's gameplay and playability.
 
+A t-test was performed to determine the difference between the set of example- and generated games. Using the relative score-difference between the controllers Explorer and Random, the two distributions are drawn from different sets with a $p$-value of $\le 0.0001$.
+
 The contrast in scores between smarter and dumber controllers is smaller in generated games than the example ones. However, in the random generation process, score values attributed to actions are also chosen at random. This possibly impacted the outcome of this results, decreasing the discrepancy between scores.
 Furthermore, it is interesting that Random and DoNothing do well in some games, as seen in Figure~\ref{graph:winrate}. While it is possible that random actions can result in good outcomes, this chance is very low, especially when compared to the chance of making informated decisions. In spite of that, Random does fairly well in randomly generated games. DoNothing does even better. While in example games it never wins, it does so, albeit rarely, in mutated ones. But in randomly generated games, it performs even better than Onestep-S and Random, which we believe indicates quite poor design of the randomly generated games.
 
 
 \section{Conclusion}
 %Julian
-Our intent has been to investigate evaluating video games via the performance of game-playing algorithms. We hypothesized that the performance difference between good and bad game-playing algorithms is higher on well-designed games, and therefore can be used as at least a partial proxy for game quality. To test this theory, we had seven controllers with varying levels of skill play 18 human-designed, 291 mutated, and 400 randomly generated VGDL games. The results seem to corroborate our initial conjecture, showing a clear distinction between results of more and less intelligent controllers across the games, with the difference decreasing as the games' qualities decrease.
+Our intent has been to investigate evaluating video games via the performance of game-playing algorithms. We hypothesized that the performance difference between good and bad game-playing algorithms is higher on well-designed games, and therefore can be used as at least a partial proxy for game quality. To test this theory, we had seven controllers with varying levels of skill play 18 human-designed, 291 mutated, and 86 randomly generated VGDL games. The results seem to corroborate our initial conjecture, showing a clear distinction between results of more and less intelligent controllers across the games, with the difference decreasing as the games' qualities decrease.
 
 We also suggest new controllers for GVG-AI: Explorer, OneStep-Score and DoNothing. The first one in particular shows strong overall performance compared to existing baselines such as ``vanilla'' MCTS.
+
+
+\begin{figure}[!ht]
+\centering
+\begin{stripedtabular}{llS[table-format = 3.2, round-mode=places, round-precision=2]S[table-format = 4.2, round-mode=places, round-precision=2]S[table-format = 1.4, round-mode=places, round-precision=4]S[table-format = 1.4, round-mode=places, round-precision=4]S[table-format = 1.4, round-mode=places, round-precision=4]l}  \toprule
+\rowcolor{white}&\textbf{\emph{controller}} & \emph{mean} & \emph{std.dev.} & \emph{normalised-mean}  & \emph{winrate} & \emph{act-entropy} &\\\midrule
+  \DTLforeach{examplesdata}{
+  \agent=Agent:,
+  \mean=Mean:,
+  \std=Std. deviation:,
+  \mmave=MaxMinN-Mean:,
+  \wrate=Winrate:,
+  \entropy=Actions entropy:}
+  {\DTLiffirstrow{}{\tabularnewline}%
+  & \agent & \mean  & \std  & \mmave  & \wrate & \entropy &} 
+  \\ \bottomrule
+\end{stripedtabular}
+\caption{Results from the 20 example games}
+\label{table:examples}
+\end{figure}
+
 
 
 % TODO
